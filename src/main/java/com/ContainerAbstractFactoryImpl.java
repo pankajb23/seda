@@ -15,9 +15,13 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created on 14/05/17 by dark magic.
  */
-public class ContainerFactory {
-    public static WorkerContainer createContainer(ContainerType containerType, int parallism,
-                                                  ConsumerQueueType queueType) {
+public class ContainerAbstractFactoryImpl implements ContainerAbstractFactory {
+    public ContainerAbstractFactoryImpl() {
+    }
+
+    @Override
+    public WorkerContainer createContainer(ContainerType containerType, int parallism,
+                                           ConsumerQueueType queueType) {
         List<WorkerProcessor> workerProcessors = new ArrayList<>(parallism);
         switch (containerType) {
             case START:
@@ -41,7 +45,8 @@ public class ContainerFactory {
         return new WorkerContainer(workerProcessors, createConsumerQueue(queueType));
     }
 
-    public static ConsumerQueue createConsumerQueue(ConsumerQueueType consumerQueueType) {
+    @Override
+    public ConsumerQueue createConsumerQueue(ConsumerQueueType consumerQueueType) {
         switch (consumerQueueType) {
             case ARRAY:
                 return new ArrayListQueue(10);
@@ -52,7 +57,7 @@ public class ContainerFactory {
         }
     }
 
-    private static List<WorkerProcessor> getPreProcessor(int parralism) {
+    private List<WorkerProcessor> getPreProcessor(int parralism) {
         List<WorkerProcessor> list = new ArrayList<>();
         Lock lock = new ReentrantLock();
         for (int i = 0; i < parralism; i++) {
@@ -61,7 +66,7 @@ public class ContainerFactory {
         return list;
     }
 
-    private static List<WorkerProcessor> getADDProcessor(int parralism) {
+    private List<WorkerProcessor> getADDProcessor(int parralism) {
         List<WorkerProcessor> list = new ArrayList<>();
         Lock lock = new ReentrantLock();
         for (int i = 0; i < parralism; i++) {
@@ -70,7 +75,7 @@ public class ContainerFactory {
         return list;
     }
 
-    private static List<WorkerProcessor> getMULTIProcessor(int parralism) {
+    private List<WorkerProcessor> getMULTIProcessor(int parralism) {
         List<WorkerProcessor> list = new ArrayList<>();
         Lock lock = new ReentrantLock();
         for (int i = 0; i < parralism; i++) {
@@ -79,7 +84,7 @@ public class ContainerFactory {
         return list;
     }
 
-    private static List<WorkerProcessor> getPOSTProcessor(int parralism) {
+    private List<WorkerProcessor> getPOSTProcessor(int parralism) {
         List<WorkerProcessor> list = new ArrayList<>();
         Lock lock = new ReentrantLock();
         for (int i = 0; i < parralism; i++) {
@@ -88,25 +93,12 @@ public class ContainerFactory {
         return list;
     }
 
-    private static List<WorkerProcessor> getPOWProcessor(int parralism) {
+    private List<WorkerProcessor> getPOWProcessor(int parralism) {
         List<WorkerProcessor> list = new ArrayList<>();
         Lock lock = new ReentrantLock();
         for (int i = 0; i < parralism; i++) {
             list.add(new PowerWorker(lock));
         }
         return list;
-    }
-
-    public enum ContainerType {
-        START,
-        ADDITION,
-        MULTIPLY,
-        POWER,
-        POST
-    }
-
-    public enum ConsumerQueueType {
-        ARRAY,
-        Linked
     }
 }
